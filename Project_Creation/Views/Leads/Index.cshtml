@@ -1,0 +1,228 @@
+﻿@model IEnumerable<Project_Creation.Models.Entities.Leads>
+@using Project_Creation.Models.Entities
+@using System.Security.Claims
+@{
+    ViewData["Title"] = "Leads Management";
+    var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="mb-0 text-accent">Leads Management</h4>
+        <a asp-action="Create" class="btn btn-accent">
+            <i class="fas fa-plus-circle me-1"></i> Add New Lead
+        </a>
+    </div>
+
+    <div class="card-body">
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                @ViewBag.ErrorMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <!-- Filter Section -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <form method="get" id="filterForm" class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Search</label>
+                        <input type="text" name="searchString" class="form-control" placeholder="Name, Email or Phone" value="@ViewBag.CurrentSearch">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-select">
+                            <option value="">All Statuses</option>
+                            @foreach (var status in Enum.GetValues(typeof(Project_Creation.Models.Entities.Leads.LeadStatus)))
+                            {
+                                if (ViewBag.CurrentStatus != null && ViewBag.CurrentStatus.ToString() == status.ToString())
+                                {
+                                    <option value="@status" selected>@status</option>
+                                }
+                                else
+                                {
+                                    <option value="@status">@status</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Company</label>
+                        <select name="companyId" class="form-select">
+                            <option value="">All Companies</option>
+                            @if (ViewBag.Companies != null)
+                            {
+                                foreach (var company in ViewBag.Companies)
+                                {
+                                    if (ViewBag.CurrentCompany != null && ViewBag.CurrentCompany.ToString() == company.Id.ToString())
+                                    {
+                                        <option value="@company.Id" selected>@company.BusinessName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@company.Id">@company.BusinessName</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">Filter</button>
+                        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">Reset</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Company
+                        </th>
+                        <th>
+                            Email / Phone
+                        </th>
+                        <th>
+                            Points / Status
+                        </th>
+                        <th>
+                            Interested In / Last Purchase
+                        </th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model) {
+                        <tr>
+                            <td>
+                                <strong>@Html.DisplayFor(modelItem => item.LeadName)</strong>
+                            </td>
+                            <td>
+                                @(item.CreatedBy?.BusinessName ?? "-")
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.LeadEmail)
+                                <br/>
+                                @Html.DisplayFor(modelItem => item.LeadPhone)
+                                <td>
+                                    @{
+                                        string statusClass = "";
+                                        string status = "";
+
+                                        // Check if the lead has purchase history but hasn't purchased in the last 30 days
+                                        bool hasOldPurchases = item.LastPurchaseDate.HasValue && 
+                                                              item.LastPurchaseDate.Value < DateTime.Now.AddDays(-30) &&
+                                                              item.LeadPoints.HasValue && 
+                                                              item.LeadPoints == 0;
+
+                                        if(item.LeadPoints >= 30){
+                                            statusClass = "bg-danger text-white";
+                                            status = "Hot";
+                                        } else if(item.LeadPoints >= 15){
+                                            statusClass = "bg-warning text-dark";
+                                            status = "Warm";
+                                        } else if(item.LeadPoints >= 5){
+                                            statusClass = "bg-info text-white";
+                                            status = "Cold";
+                                        } else if(hasOldPurchases){
+                                            statusClass = "bg-secondary text-white";
+                                            status = "Lost";
+                                        } else if(item.LeadPoints >= 0){
+                                            statusClass = "bg-light text-dark border border-secondary";
+                                            status = "New";
+                                        } else {
+                                            statusClass = "bg-primary text-white";
+                                            status = "New";
+                                        }
+                                    }
+                                    <div>
+                                        <span class="badge bg-dark">@(item.LeadPoints ?? 0) pts</span>
+                                        <span class="badge @statusClass">@status</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (item.InterestedProductNames != null && item.InterestedProductNames.Any())
+                                    {
+                                        <div class="product-tags mb-1">
+                                            <small class="text-muted">Interested in:</small><br/>
+                                            @foreach (var product in item.InterestedProductNames.Take(2))
+                                            {
+                                                <span class="badge bg-light text-dark me-1">@product</span>
+                                            }
+                                            @if (item.InterestedProductNames.Count > 2)
+                                            {
+                                                <span class="badge bg-light text-dark">+@(item.InterestedProductNames.Count - 2) more</span>
+                                            }
+                                        </div>
+                                    }
+
+                                    @if (item.LastPurchasedName != null)
+                                    {
+                                        <div class="mt-1">
+                                            <small class="text-muted">Last purchase:</small><br/>
+                                            <span class="badge bg-success text-white">@item.LastPurchasedName</span>
+                                            @if (item.LastPurchaseDate.HasValue)
+                                            {
+                                                <small class="text-muted ms-2">(@item.LastPurchaseDate.Value.ToString("MMM dd, yyyy"))</small>
+                                            }
+                                        </div>
+                                    }
+                                    else if (!item.InterestedProductNames.Any())
+                                    {
+                                        <span class="text-muted">No product history</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    @if (item.CreatedById == currentUserId)
+                                    {
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                    }
+                                    else{
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

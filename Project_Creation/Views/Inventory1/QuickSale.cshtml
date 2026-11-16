@@ -1,0 +1,448 @@
+﻿@model Project_Creation.Models.ViewModels.QuickSaleViewModel
+
+@{
+    ViewData["Title"] = "Quick Sale";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header  d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 text-accent">Quick Sale</h4>
+            <!-- Purchase Points System Info Button -->
+            <button class="btn btn-info" type="button" data-bs-toggle="collapse" data-bs-target="#pointsSystemInfo" aria-expanded="true" aria-controls="pointsSystemInfo">
+                <i class="fas fa-info-circle me-2"></i>Purchase Points System
+            </button>
+        </div>
+        <div class="card-body">
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <li>@error.ErrorMessage</li>
+                        }
+                    </ul>
+                </div>
+            }
+            
+            @if (TempData["LeadMatched"] != null)
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-user-check me-2"></i> @TempData["LeadMatched"]
+                </div>
+            }
+
+            <form asp-action="QuickSale" method="post" id="quickSaleForm">
+                <div class="row mb-3">
+                    <div class="col-12 mb-3">
+                        <div class="collapse" id="pointsSystemInfo">
+                            <div class="card card-body mt-2">
+                                <p class="mb-1">Each purchased item:</p>
+                                <ul class="mb-2">
+                                    <li>+1 point per 1000 cost spent</li>
+                                    <li>+1 point per same product</li>
+                                    <li>+2 points per different product</li>
+                                </ul>
+                                <p class="mb-0"><strong>Lead Status:</strong> <br/>
+                                15+ points = Warm, <br/>
+                                30+ points = Hot, <br/>
+                                &lt;5 points = Cold, <br/>
+                                No purchase in 30 days = Lost</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-12">
+                        <div class="row p-3 bg-white mb-4">
+                            <div class="col-md-12 mb-3">
+                                <div class="d-flex">
+                                    <div class="form-check me-4">
+                                        <input class="form-check-input" type="radio" name="SelectedOptions" id="newCustomer" value="new" checked>
+                                        <label class="form-check-label fw-bold" for="newCustomer">
+                                            New Customer
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="SelectedOptions" id="anonymousCustomer" value="anonymous">
+                                        <label class="form-check-label fw-bold" for="anonymousCustomer">
+                                            Anonymous Buyer
+                                        </label>
+                                    </div>
+                                </div>
+                                <span asp-validation-for="SelectedOptions" class="text-danger"></span>
+                            </div>
+                            
+                            <!-- New Customer Section -->
+                            <div id="newCustomerSection" class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label asp-for="CustomerName" class="form-label">Customer Name</label>
+                                        <input asp-for="CustomerName" class="form-control" placeholder="Enter customer name" />
+                                        <span asp-validation-for="CustomerName" class="text-danger"></span>
+                                    </div>
+                                    
+                                    <div class="col-md-4 mb-3">
+                                        <label for="CustomerEmail" class="form-label">Customer Email</label>
+                                        <input type="email" id="CustomerEmail" name="CustomerEmail" class="form-control" placeholder="Enter email address" />
+                                    </div>
+                                    
+                                    <div class="col-md-4 mb-3">
+                                        <label for="CustomerPhone" class="form-label">Customer Phone</label>
+                                        <input type="tel" id="CustomerPhone" name="CustomerPhone" class="form-control" placeholder="Enter phone number" />
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="createLead" name="CreateLead" value="true" checked>
+                                            <label class="form-check-label" for="createLead">
+                                                Create a lead from this customer
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="isAllowToCampaign" name="isAllowToCampaign" value="true" checked>
+                                            <label class="form-check-label" for="isAllowToCampaign">
+                                                Allow to receive campaigns
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Anonymous Buyer Section -->
+                        <div id="anonymousCustomerSection" style="display:none;">
+                            <div class="alert alert-info">
+                                <i class="fas fa-user-secret me-2"></i>
+                                This sale will be recorded as an anonymous purchase. No customer information will be stored.
+                            </div>
+                            <input type="hidden" id="anonymousCustomerName" name="CustomerName" value="Anonymous Buyer" />
+                            <input type="hidden" id="anonymousCreateLead" name="CreateLead" value="false" />
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <!-- Removed existing customer section -->
+                    </div>
+                </div>
+
+                <h5 class="border-bottom pb-2 mb-3">Products</h5>
+                <div id="items-container">
+                    <!-- Initial item -->
+                    <div class="item-row mb-3 row">
+                        <div class="col-md-5">
+                            <label class="form-label">Product</label>
+                            <select name="Items[0].ProductId" class="form-select product-select" required>
+                                <option value="">Select a product</option>
+                                @if (ViewBag.Products != null)
+                                {
+                                    @foreach (var product in ViewBag.Products)
+                                    {
+                                        <option value="@product.Id" data-price="@product.SellingPrice" data-stock="@product.QuantityInStock">
+                                            @product.ProductName (@product.QuantityInStock in stock) - @product.SellingPrice.ToString("C")
+                                        </option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="">No products available</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Quantity</label>
+                            <input type="number" name="Items[0].Quantity" class="form-control quantity-input" min="1" value="1" required />
+                            <small class="form-text text-muted available-stock">Max available: 0</small>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Php</span>
+                                <input type="text" name="Items[0].Price" class="form-control item-price" readonly />
+                            </div>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="button" class="btn btn-danger remove-item" style="display:none">Remove</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <button type="button" id="add-item" class="btn btn-secondary">Add Another Item</button>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4>Total: <span id="total-amount">$0.00</span></h4>
+                    <button type="submit" class="btn btn-primary">Complete Sale</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Form validation before submission
+            $('form').on('submit', function(e) {
+                let isValid = true;
+                let errorMessage = '';
+                
+                // Check if a customer type is selected
+                if (!$('input[name="SelectedOptions"]:checked').length) {
+                    isValid = false;
+                    errorMessage = 'Please select a customer type (New Customer or Anonymous Buyer)';
+                }
+                
+                // For new customer, check if name is provided
+                else if ($('#newCustomer').is(':checked') && !$('#CustomerName').val().trim()) {
+                    isValid = false;
+                    errorMessage = 'Please enter a customer name';
+                }
+                
+                // Check if at least one product is selected
+                else {
+                    let productSelected = false;
+                    $('.product-select').each(function() {
+                        if ($(this).val()) {
+                            productSelected = true;
+                            return false; // break the loop
+                        }
+                    });
+                    
+                    if (!productSelected) {
+                        isValid = false;
+                        errorMessage = 'Please select at least one product';
+                    }
+                    
+                    // Check all quantities are valid
+                    else {
+                        $('.item-row').each(function() {
+                            const select = $(this).find('.product-select');
+                            const quantityInput = $(this).find('.quantity-input');
+
+                            if (select.val()) {
+                                const max = parseInt(select.find('option:selected').data('stock')) || 0;
+                                const quantity = parseInt(quantityInput.val()) || 0;
+
+                                if (quantity > max) {
+                                    isValid = false;
+                                    errorMessage = `Quantity for ${select.find('option:selected').text()} exceeds available stock (${max})`;
+                                    return false; // break out of each loop
+                                }
+                                
+                                if (quantity <= 0) {
+                                    isValid = false;
+                                    errorMessage = `Quantity must be greater than 0`;
+                                    return false;
+                                }
+                            }
+                        });
+                    }
+                }
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    alert(errorMessage);
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            // Toggle between customer options
+            $('input[name="SelectedOptions"]').change(function() {
+                if ($(this).val() === 'new') {
+                    $('#newCustomerSection').show();
+                    $('#anonymousCustomerSection').hide();
+                    // Enable/disable form fields
+                    $('#CustomerName, #CustomerEmail, #CustomerPhone, #createLead, #isAllowToCampaign').prop('disabled', false);
+                    $('#anonymousCustomerName, #anonymousCreateLead').prop('disabled', true);
+                } else if ($(this).val() === 'anonymous') {
+                    $('#newCustomerSection').hide();
+                    $('#anonymousCustomerSection').show();
+                    // Enable/disable form fields
+                    $('#CustomerName, #CustomerEmail, #CustomerPhone, #createLead, #isAllowToCampaign').prop('disabled', true);
+                    $('#anonymousCustomerName, #anonymousCreateLead').prop('disabled', false);
+                }
+            });
+
+            if ($('#quickSalesTable').length) {
+                $('#quickSalesTable').DataTable({
+                    "paging": true,
+                    "ordering": true,
+                    "info": true,
+                    "responsive": true
+                });
+            }
+
+            // Prevent form submission when pressing Enter in quantity inputs
+            $(document).on('keypress', '.quantity-input', function(e) {
+                if (e.which === 13) { // 13 is the Enter key code
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
+            // Rest of your existing QuickSale JavaScript
+            let itemCount = 1;
+
+            // Initialize the first row price and total
+            updateItemPrice($('.product-select').first());
+            updateTotal();
+
+            // Update price and quantity limit when product changes
+            $(document).on('change', '.product-select', function() {
+                updateItemPrice($(this));
+                updateQuantityLimit($(this));
+                updateTotal();
+            });
+
+            // Update item price based on selected product
+            function updateItemPrice(selectElement) {
+                const option = selectElement.find('option:selected');
+                const row = selectElement.closest('.item-row');
+                const priceInput = row.find('.item-price');
+
+                if (option.val()) {
+                    const price = parseFloat(option.data('price')) || 0;
+                    priceInput.val(price.toFixed(2));
+                } else {
+                    priceInput.val('');
+                }
+            }
+
+            // Update quantity input limit based on available stock
+            function updateQuantityLimit(selectElement) {
+                const option = selectElement.find('option:selected');
+                const row = selectElement.closest('.item-row');
+                const quantityInput = row.find('.quantity-input');
+                const availableStockText = row.find('.available-stock');
+
+                if (option.val()) {
+                    const stock = parseInt(option.data('stock')) || 0;
+                    quantityInput.attr('max', stock);
+                    availableStockText.text(`Max available: ${stock}`);
+
+                    // Adjust current quantity if it exceeds the new max
+                    if (parseInt(quantityInput.val()) > stock) {
+                        quantityInput.val(stock);
+                    }
+                } else {
+                    quantityInput.removeAttr('max');
+                    availableStockText.text('Max available: 0');
+                }
+            }
+
+            // Add new item row
+            $('#add-item').click(function() {
+                const newRow = `
+                    <div class="item-row mb-3 row">
+                        <div class="col-md-5">
+                            <label class="form-label">Product</label>
+                            <select name="Items[${itemCount}].ProductId" class="form-select product-select" required>
+                                <option value="">Select a product</option>
+                                @if (ViewBag.Products != null)
+                                {
+                                    @foreach (var product in ViewBag.Products)
+                                    {
+                                        <option value="@product.Id" data-price="@product.SellingPrice" data-stock="@product.QuantityInStock">
+                                            @product.ProductName (@product.QuantityInStock in stock) - @product.SellingPrice.ToString("C")
+                                        </option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="">No products available</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Quantity</label>
+                            <input type="number" name="Items[${itemCount}].Quantity" class="form-control quantity-input" min="1" value="1" required />
+                            <small class="form-text text-muted available-stock">Max available: 0</small>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Php</span>
+                                <input type="text" name="Items[${itemCount}].Price" class="form-control item-price" readonly />
+                            </div>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="button" class="btn btn-danger remove-item">Remove</button>
+                        </div>
+                    </div>
+                `;
+
+                $('#items-container').append(newRow);
+                itemCount++;
+
+                // Show remove button for the first item if we now have more than one item
+                if (itemCount > 1) {
+                    $('.remove-item').show();
+                }
+            });
+
+            // Remove item row
+            $(document).on('click', '.remove-item', function() {
+                $(this).closest('.item-row').remove();
+                itemCount--;
+
+                // Renumber the remaining rows to keep indexes sequential
+                $('.item-row').each(function(index) {
+                    $(this).find('select').attr('name', `Items[${index}].ProductId`);
+                    $(this).find('input[type="number"]').attr('name', `Items[${index}].Quantity`);
+                    $(this).find('.item-price').attr('name', `Items[${index}].Price`);
+                });
+
+                // Hide remove button if only one item left
+                if (itemCount === 1) {
+                    $('.remove-item').hide();
+                }
+
+                updateTotal();
+            });
+
+            // Update total when product or quantity changes
+            $(document).on('change', '.product-select, .quantity-input', function() {
+                updateTotal();
+            });
+
+            // Validate quantity doesn't exceed stock when changed
+            $(document).on('change', '.quantity-input', function() {
+                const row = $(this).closest('.item-row');
+                const select = row.find('.product-select');
+                const max = parseInt(select.find('option:selected').data('stock')) || 0;
+                const quantity = parseInt($(this).val()) || 0;
+
+                if (quantity > max) {
+                    $(this).val(max);
+                    alert(`Quantity cannot exceed available stock (${max})`);
+                }
+            });
+
+            function updateTotal() {
+                let total = 0;
+
+                $('.item-row').each(function() {
+                    const select = $(this).find('.product-select');
+                    const quantity = parseInt($(this).find('.quantity-input').val()) || 0;
+
+                    if (select.val()) {
+                        const price = parseFloat(select.find('option:selected').data('price')) || 0;
+                        const itemTotal = price * quantity;
+                        $(this).find('.item-price').val(price.toFixed(2));
+                        total += itemTotal;
+                    }
+                });
+
+                $('#total-amount').text('P' + total.toFixed(2));
+            }
+        });
+    </script>
+}   

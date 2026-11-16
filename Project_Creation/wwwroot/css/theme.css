@@ -1,0 +1,661 @@
+/* ==========================================================================
+   GrowTrack Minimalist UI/UX Design System (theme.css)
+   Palette:
+     - Primary BG (Warm Alabaster): #F7F5EF
+     - Secondary BG (Soft Mist Teal): #E9F3F6
+     - Accent (Warm Amber Orange): #F3993E
+     - Dark / Primary Ink (Deep Slate Navy): #304251
+   Typography:
+     - Headings / Display: 'Plus Jakarta Sans', sans-serif
+     - Body / UI / Data: 'Inter', sans-serif
+   ========================================================================== */
+
+:root {
+    /* Core Brand Palette (Preserved) */
+    --primary-bg: #F7F5EF;
+    --secondary-bg: #E9F3F6;
+    --accent-color: #F3993E;
+    --dark-color: #304251;
+
+    /* Interactive & Tonal States */
+    --accent-hover: #e48a30;
+    --dark-hover: #243340;
+    --accent-light: rgba(243, 153, 62, 0.12);
+    --accent-ring: rgba(243, 153, 62, 0.22);
+    --dark-light: rgba(48, 66, 81, 0.08);
+    --secondary-hover: #dcebf0;
+
+    /* Surface & Text Hierarchy */
+    --surface-white: #ffffff;
+    --surface-elevated: rgba(255, 255, 255, 0.92);
+    --text-light: #ffffff;
+    --text-dark: #304251;
+    --text-body: #3d5162;
+    --text-muted: #64748b;
+    --border-light: rgba(48, 66, 81, 0.09);
+    --border-strong: rgba(48, 66, 81, 0.16);
+
+    /* Minimalist Layered Shadows (Tinted with Deep Navy) */
+    --shadow-xs: 0 1px 2px rgba(48, 66, 81, 0.04);
+    --shadow-sm: 0 2px 8px -2px rgba(48, 66, 81, 0.06), 0 1px 3px rgba(48, 66, 81, 0.04);
+    --shadow-md: 0 8px 24px -4px rgba(48, 66, 81, 0.08), 0 2px 6px -1px rgba(48, 66, 81, 0.04);
+    --shadow-lg: 0 16px 36px -6px rgba(48, 66, 81, 0.12), 0 4px 10px -2px rgba(48, 66, 81, 0.05);
+
+    /* Optical Radii */
+    --radius-sm: 0.5rem;    /* 8px */
+    --radius-md: 0.75rem;   /* 12px */
+    --radius-lg: 1rem;      /* 16px */
+    --radius-pill: 9999px;
+
+    /* Font Stacks */
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-display: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ==========================================================================
+   1. Base Typography & Optical Rhythm
+   ========================================================================== */
+html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--primary-bg);
+    color: var(--text-dark);
+    font-family: var(--font-sans);
+    font-size: 0.9375rem; /* 15px optical sweet spot for SaaS/CRM */
+    line-height: 1.6;
+    letter-spacing: -0.006em;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6,
+.navbar-brand,
+.modal-title,
+.card-title {
+    font-family: var(--font-display);
+    color: var(--dark-color);
+    font-weight: 700;
+    letter-spacing: -0.022em;
+    line-height: 1.25;
+}
+
+h1, .h1 { font-size: clamp(1.75rem, 2.5vw, 2.25rem); margin-bottom: 0.75rem; }
+h2, .h2 { font-size: clamp(1.4rem, 2vw, 1.75rem); margin-bottom: 0.65rem; }
+h3, .h3 { font-size: clamp(1.2rem, 1.5vw, 1.375rem); margin-bottom: 0.5rem; }
+h4, .h4 { font-size: 1.125rem; font-weight: 600; }
+h5, .h5 { font-size: 1rem; font-weight: 600; }
+h6, .h6 { font-size: 0.875rem; font-weight: 600; letter-spacing: -0.01em; }
+
+p {
+    color: var(--text-body);
+    margin-bottom: 1rem;
+}
+
+/* Tabular numbers for financial, inventory, and analytics alignment */
+.table td,
+.metric-value,
+.badge,
+input[type="number"] {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Prevent Tailwind .collapse from hiding Bootstrap .collapse.show elements */
+.collapse:not(.show) {
+    display: none;
+}
+.collapse.show {
+    visibility: visible !important;
+}
+
+/* ==========================================================================
+   2. Semantic Background & Text Utilities
+   ========================================================================== */
+.bg-primary {
+    background-color: var(--secondary-bg) !important;
+    color: var(--text-dark) !important;
+    border-color: var(--secondary-bg) !important;
+}
+
+.bg-secondary, .bg-dark {
+    background-color: var(--primary-bg) !important;
+    color: var(--text-dark) !important;
+    border-color: var(--primary-bg) !important;
+}
+
+.bg-light {
+    background-color: var(--primary-bg) !important;
+}
+
+.bg-info {
+    background-color: var(--secondary-bg) !important;
+    color: var(--text-dark) !important;
+}
+
+.bg-accent {
+    background-color: var(--accent-color) !important;
+    color: var(--text-light) !important;
+}
+
+.bg-dark-accent {
+    background-color: var(--dark-color) !important;
+    color: var(--text-light) !important;
+}
+
+.text-primary, .bgg-primary {
+    color: var(--dark-color) !important;
+}
+
+.text-secondary, .text-muted {
+    color: var(--text-muted) !important;
+}
+
+.text-accent {
+    color: var(--accent-color) !important;
+}
+
+/* ==========================================================================
+   3. Minimalist Buttons (Optical Padding: Horizontal > Vertical)
+   ========================================================================== */
+.btn {
+    font-family: var(--font-sans);
+    font-size: 0.875rem; /* 14px crisp legibility */
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    padding: 0.5625rem 1.25rem; /* 9px top/bottom, 20px left/right for optical balance */
+    border-radius: var(--radius-sm);
+    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    box-shadow: var(--shadow-xs);
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.btn-sm {
+    font-size: 0.8125rem; /* 13px */
+    padding: 0.375rem 0.875rem; /* 6px vertical, 14px horizontal */
+    border-radius: 0.425rem;
+}
+
+.btn-lg {
+    font-size: 0.9375rem; /* 15px */
+    padding: 0.75rem 1.625rem;
+    border-radius: var(--radius-md);
+}
+
+.btn-primary, .btn-accent {
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+    color: var(--text-light) !important;
+    box-shadow: 0 2px 6px rgba(243, 153, 62, 0.25);
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active,
+.btn-accent:hover, .btn-accent:focus, .btn-accent:active {
+    background-color: var(--accent-hover) !important;
+    border-color: var(--accent-hover) !important;
+    color: var(--text-light) !important;
+    box-shadow: 0 4px 12px rgba(243, 153, 62, 0.32);
+    transform: translateY(-1px);
+}
+
+.btn-secondary, .btn-info {
+    background-color: var(--secondary-bg) !important;
+    border-color: transparent !important;
+    color: var(--text-dark) !important;
+}
+
+.btn-secondary:hover, .btn-secondary:focus, .btn-secondary:active,
+.btn-info:hover, .btn-info:focus, .btn-info:active {
+    background-color: var(--secondary-hover) !important;
+    border-color: transparent !important;
+    color: var(--text-dark) !important;
+}
+
+.btn-success, .btn-dark {
+    background-color: var(--dark-color) !important;
+    border-color: var(--dark-color) !important;
+    color: var(--text-light) !important;
+}
+
+.btn-success:hover, .btn-success:focus, .btn-success:active,
+.btn-dark:hover, .btn-dark:focus, .btn-dark:active {
+    background-color: var(--dark-hover) !important;
+    border-color: var(--dark-hover) !important;
+    color: var(--text-light) !important;
+    transform: translateY(-1px);
+}
+
+.btn-outline-primary {
+    color: var(--accent-color) !important;
+    border: 1.5px solid var(--accent-color) !important;
+    background-color: transparent !important;
+    box-shadow: none;
+}
+
+.btn-outline-primary:hover, .btn-outline-primary:focus, .btn-outline-primary:active {
+    background-color: var(--accent-color) !important;
+    color: var(--text-light) !important;
+    box-shadow: 0 4px 12px rgba(243, 153, 62, 0.22);
+}
+
+.btn-outline-secondary {
+    color: var(--text-dark) !important;
+    border: 1px solid var(--border-strong) !important;
+    background-color: var(--surface-white) !important;
+}
+
+.btn-outline-secondary:hover, .btn-outline-secondary:focus, .btn-outline-secondary:active {
+    background-color: var(--secondary-bg) !important;
+    border-color: var(--secondary-bg) !important;
+    color: var(--text-dark) !important;
+}
+
+/* ==========================================================================
+   4. Cards & Containers (Minimalist Elevation & Optical Breathing Room)
+   ========================================================================== */
+.card {
+    background-color: var(--surface-white);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    overflow: hidden;
+}
+
+.card-header {
+    background-color: var(--secondary-bg) !important;
+    color: var(--text-dark) !important;
+    border-bottom: 1px solid var(--border-light);
+    padding: 1.125rem 1.5rem; /* 18px top/bottom, 24px left/right */
+    font-family: var(--font-display);
+    font-weight: 600;
+}
+
+.card-body {
+    padding: 1.5rem; /* 24px optical breathing room */
+}
+
+.card-footer {
+    background-color: var(--primary-bg) !important;
+    border-top: 1px solid var(--border-light);
+    padding: 1rem 1.5rem;
+}
+
+/* ==========================================================================
+   5. Tables & DataTables (High Scannability, Eye-Friendly Spacing)
+   ========================================================================== */
+.table {
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-xs);
+    margin-bottom: 1.5rem;
+    background-color: var(--surface-white);
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table th, .thead-dark th, .table-dark th {
+    background-color: var(--secondary-bg) !important;
+    color: var(--dark-color) !important;
+    border-bottom: 1px solid var(--border-light) !important;
+    font-family: var(--font-sans);
+    font-size: 0.75rem; /* 12px uppercase column headers */
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.055em;
+    padding: 0.875rem 1.125rem; /* 14px vertical, 18px horizontal */
+    vertical-align: middle;
+}
+
+.table td {
+    padding: 0.9375rem 1.125rem; /* 15px vertical, 18px horizontal for effortless eye tracking */
+    border-bottom: 1px solid rgba(48, 66, 81, 0.06);
+    vertical-align: middle;
+    color: var(--text-body);
+    font-size: 0.875rem; /* 14px */
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: var(--surface-white) !important;
+}
+
+.table-striped tbody tr:nth-of-type(even) {
+    background-color: rgba(247, 245, 239, 0.55) !important;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(233, 243, 246, 0.65) !important;
+    transition: background-color 0.15s ease;
+}
+
+.table .highlight {
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+/* DataTables Controls */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    background: var(--dark-color) !important;
+    color: var(--text-light) !important;
+    border-color: var(--dark-color) !important;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: var(--secondary-bg) !important;
+    color: var(--text-dark) !important;
+    border-color: transparent !important;
+    border-radius: var(--radius-sm);
+}
+
+.dataTables_wrapper .dataTables_filter input,
+.dataTables_wrapper .dataTables_length select {
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 0.45rem 0.85rem;
+    font-size: 0.875rem;
+    background-color: var(--surface-white);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dataTables_wrapper .dataTables_filter input:focus,
+.dataTables_wrapper .dataTables_length select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px var(--accent-ring);
+    outline: none;
+}
+
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_processing,
+.dataTables_wrapper .dataTables_paginate {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-bottom: 0.85rem;
+}
+
+/* ==========================================================================
+   6. Forms & Inputs (Clean Minimalist Controls)
+   ========================================================================== */
+.form-label, label {
+    font-size: 0.84375rem; /* 13.5px */
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 0.4rem;
+    letter-spacing: -0.005em;
+}
+
+.form-control, .form-select {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    background-color: var(--surface-white);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 0.9rem; /* 9.6px vertical, 14.4px horizontal */
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3.5px var(--accent-ring);
+    outline: none;
+}
+
+.input-group-text {
+    background-color: var(--secondary-bg);
+    border-color: var(--border-strong);
+    color: var(--text-dark);
+    font-size: 0.875rem;
+    padding: 0.6rem 0.9rem;
+}
+
+.form-check-input:checked {
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+}
+
+/* ==========================================================================
+   7. Modals, Badges, Alerts & Tabs
+   ========================================================================== */
+.modal-content {
+    background-color: var(--surface-white);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+}
+
+.modal-header {
+    background-color: var(--secondary-bg) !important;
+    color: var(--text-dark) !important;
+    border-bottom: 1px solid var(--border-light);
+    padding: 1.15rem 1.5rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    background-color: var(--primary-bg) !important;
+    border-top: 1px solid var(--border-light);
+    padding: 1rem 1.5rem;
+}
+
+.badge {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 0.01em;
+    padding: 0.35em 0.75em; /* Wider horizontal pill padding */
+    border-radius: var(--radius-pill);
+}
+
+.badge.bg-primary, .badge.bg-info {
+    background-color: var(--secondary-bg) !important;
+    color: var(--text-dark) !important;
+}
+
+.badge.bg-secondary {
+    background-color: var(--primary-bg) !important;
+    color: var(--text-dark) !important;
+}
+
+.badge.bg-success {
+    background-color: var(--dark-color) !important;
+    color: var(--text-light) !important;
+}
+
+.badge.bg-warning, .badge.bg-accent {
+    background-color: var(--accent-color) !important;
+    color: var(--text-light) !important;
+}
+
+.nav-tabs {
+    border-bottom: 1px solid var(--border-light);
+    gap: 0.25rem;
+}
+
+.nav-tabs .nav-link {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--text-muted) !important;
+    border: none;
+    padding: 0.75rem 1.15rem;
+    transition: color 0.15s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: transparent;
+    color: var(--dark-color) !important;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--accent-color) !important;
+    font-weight: 600;
+    background-color: transparent;
+    border-bottom: 2.5px solid var(--accent-color) !important;
+}
+
+/* ==========================================================================
+   8. Modern Minimalist Navbar & Navigation Links
+   ========================================================================== */
+.navbar-modern {
+    background-color: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-light);
+    box-shadow: var(--shadow-xs);
+    transition: all 0.25s ease;
+    z-index: 1030;
+}
+
+.navbar-modern.scrolled {
+    background-color: rgba(255, 255, 255, 0.96);
+    box-shadow: var(--shadow-md);
+}
+
+.navbar-modern .navbar-brand {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.25rem;
+    letter-spacing: -0.03em;
+    color: var(--dark-color);
+}
+
+.navbar-modern .nav-link {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 0.875rem; /* 14px — upgraded from tiny 12px for comfortable reading */
+    color: var(--text-body) !important;
+    padding: 0.5rem 0.875rem;
+    border-radius: var(--radius-sm);
+    position: relative;
+    transition: color 0.18s ease, background-color 0.18s ease;
+}
+
+.navbar-modern .nav-link:hover {
+    color: var(--dark-color) !important;
+    background-color: rgba(48, 66, 81, 0.04);
+}
+
+.navbar-modern .nav-link.active {
+    color: var(--accent-color) !important;
+    font-weight: 600;
+    background-color: var(--accent-light);
+}
+
+/* Dropdown Menus */
+.navbar-modern .dropdown-menu {
+    background-color: var(--surface-white);
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-lg);
+    border-radius: var(--radius-md);
+    padding: 0.45rem;
+    margin-top: 0.5rem;
+    min-width: 13.5rem;
+}
+
+.navbar-modern .dropdown-item {
+    font-family: var(--font-sans);
+    color: var(--text-body);
+    font-weight: 500;
+    font-size: 0.875rem; /* 14px — upgraded from 12px */
+    padding: 0.55rem 0.85rem;
+    border-radius: 0.45rem;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.navbar-modern .dropdown-item:hover,
+.navbar-modern .dropdown-item:focus,
+.navbar-modern .dropdown-item.active,
+.navbar-modern .dropdown-item:active {
+    color: var(--accent-color);
+    background-color: var(--accent-light);
+}
+
+.navbar-modern .dropdown-item i {
+    width: 1.15rem;
+    text-align: center;
+    color: currentColor;
+    opacity: 0.85;
+}
+
+/* Content Top Spacing for Fixed Navbar */
+body.has-navbar .content-area {
+    margin-top: 4.25rem; /* 68px optical clearance below fixed navbar */
+    min-height: calc(100vh - 8.5rem);
+}
+
+/* ==========================================================================
+   9. Icon Circles & External Library Overrides
+   ========================================================================== */
+.icon-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.icon-circle-primary {
+    background-color: var(--secondary-bg);
+    color: var(--text-dark);
+}
+
+.icon-circle-secondary {
+    background-color: var(--primary-bg);
+    color: var(--text-dark);
+}
+
+.icon-circle-accent {
+    background-color: var(--accent-light);
+    color: var(--accent-color);
+}
+
+.icon-circle-dark {
+    background-color: var(--dark-light);
+    color: var(--dark-color);
+}
+
+.swal2-popup {
+    font-family: var(--font-sans) !important;
+    border-radius: var(--radius-lg) !important;
+}
+
+.swal2-title {
+    font-family: var(--font-display) !important;
+    color: var(--dark-color) !important;
+}
+
+.swal2-confirm {
+    background-color: var(--accent-color) !important;
+    border-radius: var(--radius-sm) !important;
+    font-weight: 600 !important;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: var(--secondary-bg) !important;
+    color: var(--text-dark) !important;
+}
